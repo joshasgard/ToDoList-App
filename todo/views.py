@@ -6,9 +6,11 @@ from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
 
 def home(request):
+    #Home page shown to user
     return render(request, 'todo/home.html')
 
 def signupuser(request):
+    #Sign up page and feature
     if request.method == 'GET':
         return render(request, 'todo/signupuser.html', {'form': UserCreationForm()})
     else:
@@ -29,6 +31,7 @@ def signupuser(request):
             #Tell user the passwords didn't match
 
 def loginuser(request):
+    # User login feature
     if request.method == 'GET':
         return render(request, 'todo/loginuser.html', {'form': AuthenticationForm()})
     else:
@@ -40,12 +43,14 @@ def loginuser(request):
             return redirect('currenttodos')
 
 def logoutuser(request):
+    #Log out feature
     if request.method == 'POST':
         logout(request)
         return redirect('home')
 
 
 def createtodo(request):
+    #Form for users to create todo lists
     if request.method == 'GET':
         return render(request, 'todo/createtodos.html', {'form': TodoForm()})
     else:
