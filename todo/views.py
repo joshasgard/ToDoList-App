@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from .forms import TodoForm
+from .models import Todo
 
 def home(request):
     #Home page shown to user
@@ -54,9 +55,19 @@ def createtodo(request):
     if request.method == 'GET':
         return render(request, 'todo/createtodos.html', {'form': TodoForm()})
     else:
-        pass
-
+        try:
+            form = TodoForm(request.POST)
+            newtodo = form.save(commit=False)
+            newtodo.user = request.user
+            newtodo.save()
+            return redirect('currenttodos')
+        except ValueError:
+            return render(request, 'todo/createtodos.html', {'form': TodoForm(), 'error':'Bad data passed in. Try again'})
 
 def currenttodos(request):
-    return render(request, 'todo/currenttodos.html')
+    todos = Todo.objects.filter(user = request.user, datecompleted__isnull = True)
+    return render(request, 'todo/currenttodos.html',{'todos':todos})
 
+def viewtodo(request, todo_pk):
+    todo = get_object_or_404(Todo, pk=todo_pk)
+    return render(request, 'todo/viewtodo.html',{'todo':todo})
